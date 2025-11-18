@@ -1,39 +1,17 @@
-# ===========================
-# ⚙️ CONFIGURATION FILE
-# ===========================
-
 import os
-from dotenv import load_dotenv
-load_dotenv()
 
-# Bot Identity
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-BOT_USERNAME = os.getenv("BOT_USERNAME", "NaGIOsintProBot")
+OWNER_ID = int(os.getenv("OWNER_ID", "123456"))
 
-# Channel Enforcement (Only MAIN channel check)
-MAIN_CHANNEL = os.getenv("MAIN_CHANNEL", "@AbdulBotz")
+# CHANNELS
+MAIN_CHANNEL = os.getenv("MAIN_CHANNEL", "@YourMainChannel")
+BACKUP_CHANNEL = os.getenv("BACKUP_CHANNEL", "@YourBackupChannel")
+PRIVATE_CHANNEL = os.getenv("PRIVATE_CHANNEL", "https://t.me/YourPrivateChannel")  # 🔥 No check join
 
-# Backup (no check, only display)
-BACKUP_CHANNEL = os.getenv("BACKUP_CHANNEL", "@darknagibackup")
-PRIVATE_INVITE = os.getenv("PRIVATE_INVITE", "https://t.me/+hyVTTQkfJS41NTFl")
-
-# Credits
-START_CREDITS = 10
-
-# APIs
-MOBILE_API = "https://ph-ng-pi.vercel.app/?number="
-PINCODE_API = "https://pincode-ng.vercel.app/lookup?pincode="
-RC_API = "https://vvvin-ng.vercel.app/lookup?rc="
-IMEI_API = "https://ng-imei-info.vercel.app/?imei_num="
-
-# Coming Soon
-GST_API = ""
-IFSC_API = ""
-
-COMING_SOON_LIST = [
-    "Aadhaar Lookup",
-    "PAN Lookup",
-    "Passport Lookup",
-    "Email OSINT",
-    "Voter ID Lookup"
-]
+# API LINKS
+API_MOBILE = "https://ph-ng-pi.vercel.app/?number="
+API_PINCODE = "https://pincode-ng.vercel.app/lookup?pincode="
+API_VEHICLE = "https://vvvin-ng.vercel.app/lookup?rc="
+API_IMEI = "https://ng-imei-info.vercel.app/?imei_num="
+API_GST = "https://api-v1.bsite.net/gst?id="
+API_IFSC = "https://ifsc.razorpay.com/"
