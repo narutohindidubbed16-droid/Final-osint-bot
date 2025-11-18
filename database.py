@@ -1,130 +1,108 @@
-# ===============================================
-# 📌 database.py — SQLite Database System (FINAL)
-# ===============================================
+# ===============================
+# 📌 database.py
+# User Database + Referral System
+# ===============================
 
 import sqlite3
-import os
 
-DB_FILE = "users.db"
+DB_NAME = "users.db"
 
 
-# -----------------------------
-# 🔥 CREATE DATABASE + TABLES
-# -----------------------------
+# ----------------------------------
+# CREATE TABLES
+# ----------------------------------
 def init_db():
-    db = sqlite3.connect(DB_FILE)
-    cur = db.cursor()
-
-    cur.execute("""
+    with sqlite3.connect(DB_NAME) as db:
+        db.execute("""
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY,
             username TEXT,
             first_name TEXT,
-            credits INTEGER DEFAULT 5,
+            credits INTEGER DEFAULT 10,
             referred_by INTEGER
         )
-    """)
+        """)
 
-    cur.execute("""
+        db.execute("""
         CREATE TABLE IF NOT EXISTS referrals (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             referrer_id INTEGER,
             referred_id INTEGER,
             UNIQUE(referrer_id, referred_id)
         )
-    """)
-
-    db.commit()
-    db.close()
+        """)
+        db.commit()
 
 
-# -----------------------------
-# 👤 CREATE NEW USER
-# -----------------------------
-def create_user(user_id, username, first_name):
-    db = sqlite3.connect(DB_FILE)
-    cur = db.cursor()
+# ----------------------------------
+# CREATE USER
+# ----------------------------------
+def create_user(uid, username, first_name):
+    with sqlite3.connect(DB_NAME) as db:
+        cur = db.execute("SELECT user_id FROM users WHERE user_id=?", (uid,))
+        if cur.fetchone():
+            return False  # already exists
 
-    cur.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
-    exists = cur.fetchone()
-
-    if exists:
-        db.close()
-        return False  # user already exists
-
-    cur.execute(
-        "INSERT INTO users(user_id, username, first_name) VALUES(?,?,?)",
-        (user_id, username, first_name)
-    )
-
-    db.commit()
-    db.close()
-    return True
+        db.execute("""
+            INSERT INTO users (user_id, username, first_name, credits)
+            VALUES (?, ?, ?, ?)
+        """, (uid, username, first_name, 10))
+        db.commit()
+        return True
 
 
-# -----------------------------
-# 💰 GET USER CREDITS
-# -----------------------------
-def get_user_credits(user_id):
-    db = sqlite3.connect(DB_FILE)
-    cur = db.cursor()
-
-    cur.execute("SELECT credits FROM users WHERE user_id=?", (user_id,))
-    row = cur.fetchone()
-
-    db.close()
-    return row[0] if row else 0
+# ----------------------------------
+# GET CREDITS
+# ----------------------------------
+def get_user_credits(uid):
+    with sqlite3.connect(DB_NAME) as db:
+        cur = db.execute("SELECT credits FROM users WHERE user_id=?", (uid,))
+        row = cur.fetchone()
+        return row[0] if row else 0
 
 
-# -----------------------------
-# ➖ DECREASE CREDITS
-# -----------------------------
-def decrease_credit(user_id):
-    db = sqlite3.connect(DB_FILE)
-    cur = db.cursor()
+# ----------------------------------
+# DECREASE CREDIT
+# ----------------------------------
+def decrease_credit(uid):
+    with sqlite3.connect(DB_NAME) as db:
+        db.execute("""
+            UPDATE users SET credits = credits - 1
+            WHERE user_id=? AND credits > 0
+        """, (uid,))
+        db.commit()
 
-    cur.execute("UPDATE users SET credits = credits - 1 WHERE user_id=?", (user_id,))
-    db.commit()
-    db.close()
 
-
-# -----------------------------
-# 🎁 REFERRAL SYSTEM
-# -----------------------------
-def add_referral(referrer_id, referred_id):
-    if referrer_id == referred_id:
+# ----------------------------------
+# ADD REFERRAL
+# ----------------------------------
+def add_referral(referrer, referred):
+    if referrer == referred:
         return False
 
-    db = sqlite3.connect(DB_FILE)
-    cur = db.cursor()
+    with sqlite3.connect(DB_NAME) as db:
 
-    # Check duplicate referral
-    cur.execute(
-        "SELECT 1 FROM referrals WHERE referrer_id=? AND referred_id=?",
-        (referrer_id, referred_id)
-    )
-    if cur.fetchone():
-        db.close()
-        return False
+        cur = db.execute("""
+            SELECT 1 FROM referrals WHERE referrer_id=? AND referred_id=?
+        """, (referrer, referred))
+        if cur.fetchone():
+            return False  # already counted
 
-    # Insert new referral
-    cur.execute(
-        "INSERT INTO referrals(referrer_id, referred_id) VALUES(?,?)",
-        (referrer_id, referred_id)
-    )
+        # add referral
+        db.execute("""
+            INSERT INTO referrals (referrer_id, referred_id)
+            VALUES (?, ?)
+        """, (referrer, referred))
 
-    # Give credit to referrer only
-    cur.execute(
-        "UPDATE users SET credits = credits + 1 WHERE user_id=?",
-        (referrer_id,)
-    )
+        # give credit to referrer
+        db.execute("""
+            UPDATE users SET credits = credits + 1 WHERE user_id=?
+        """, (referrer,))
 
-    # Store who referred this user
-    cur.execute(
-        "UPDATE users SET referred_by=? WHERE user_id=?",
-        (referrer_id, referred_id)
-    )
+        # register referred_by
+        db.execute("""
+            UPDATE users SET referred_by=? WHERE user_id=?
+        """, (referrer, referred))
 
-    db.commit()
-    db.close()
-    return True
+        db.commit()
+        return True
