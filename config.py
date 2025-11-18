@@ -1,53 +1,39 @@
-# ============================================
-# ⚙️ CONFIGURATION FILE (FINAL – PYROGRAM v2)
-# ============================================
+# ===========================
+# ⚙️ CONFIGURATION FILE
+# ===========================
 
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# ---------------------------
-# 🔥 BOT SETTINGS
-# ---------------------------
+# Bot Identity
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 BOT_USERNAME = os.getenv("BOT_USERNAME", "NaGIOsintProBot")
 
-# PUBLIC CHANNEL (only this must be checked)
+# Channel Enforcement (Only MAIN channel check)
 MAIN_CHANNEL = os.getenv("MAIN_CHANNEL", "@AbdulBotz")
 
-# PRIVATE CHANNEL (only for display)
+# Backup (no check, only display)
+BACKUP_CHANNEL = os.getenv("BACKUP_CHANNEL", "@darknagibackup")
 PRIVATE_INVITE = os.getenv("PRIVATE_INVITE", "https://t.me/+hyVTTQkfJS41NTFl")
 
-# BACKUP CHANNEL (only for display)
-BACKUP_CHANNEL = os.getenv("BACKUP_CHANNEL", "https://t.me/+mPzuc3vtf0c0ZWI9")
+# Credits
+START_CREDITS = 10
 
-# STARTING USER CREDITS
-START_CREDITS = 5
-
-# ---------------------------
-# 🔥 API LINKS
-# ---------------------------
+# APIs
 MOBILE_API = "https://ph-ng-pi.vercel.app/?number="
 PINCODE_API = "https://pincode-ng.vercel.app/lookup?pincode="
 RC_API = "https://vvvin-ng.vercel.app/lookup?rc="
 IMEI_API = "https://ng-imei-info.vercel.app/?imei_num="
 
-# Empty = Coming soon
+# Coming Soon
 GST_API = ""
 IFSC_API = ""
 
-# ---------------------------
-# 🚀 COMING SOON FEATURES
-# ---------------------------
 COMING_SOON_LIST = [
     "Aadhaar Lookup",
     "PAN Lookup",
-    "Voter ID Lookup",
-    "Passport OSINT",
-    "Email OSINT"
+    "Passport Lookup",
+    "Email OSINT",
+    "Voter ID Lookup"
 ]
-
-# ---------------------------
-# 🔥 OWNER / SUPPORT
-# ---------------------------
-OWNER_USER = "@AbdulBotz"
